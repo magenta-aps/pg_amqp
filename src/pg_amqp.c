@@ -352,8 +352,12 @@ pg_amqp_publish_opt(PG_FUNCTION_ARGS, int channel) {
           elog(ERROR, "out of memory");
           PG_RETURN_BOOL(0 != 0);
         }
-        
+
+#if PG_VERSION_NUM < 90500
         iter = array_create_iterator(v, 0);
+#else
+        iter = array_create_iterator(v, 0, NULL);
+#endif
         i = 0;
         while (array_iterate(iter, &value, &isnull)){
           char* key;

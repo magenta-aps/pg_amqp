@@ -355,7 +355,11 @@ int pg_process_array(ArrayType* v, FunctionCallInfoData* fcinfo, pg_array_foo* a
   
   fmgr_info_cxt(typiofunc, &array_foo->proc, fcinfo->flinfo->fn_mcxt);
   array_foo->elems = dims[0];
+#if PG_VERSION_NUM < 90500
   array_foo->iter = array_create_iterator(v, 0);
+#else
+  array_foo->iter = array_create_iterator(v, 0, NULL);
+#endif
   return 0;
 }
 

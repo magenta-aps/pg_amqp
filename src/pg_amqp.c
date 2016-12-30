@@ -66,9 +66,9 @@
 
 #define safe_free(x) if (x){ free(x); x = NULL; }
 
-#define _BYTES_T 0
-#define _UINT64_T 1
-#define _UINT8_T 2
+#define PGAMQP_BYTES_T 0
+#define PGAMQP_UINT64_T 1
+#define PGAMQP_UINT8_T 2
 
 #ifdef PG_MODULE_MAGIC
 PG_MODULE_MAGIC;
@@ -94,19 +94,19 @@ typedef struct {
 } amqp_field;
 
 /* TODO: make this a trie or some other optimised datastructure */
-static amqp_field amqp_fields[] = { { "content_type", offsetof(amqp_basic_properties_t,content_type), _BYTES_T, AMQP_BASIC_CONTENT_TYPE_FLAG},
-                                    { "content_encoding", offsetof(amqp_basic_properties_t,content_encoding), _BYTES_T, AMQP_BASIC_CONTENT_ENCODING_FLAG},
-                                    { "delivery_mode", offsetof(amqp_basic_properties_t,delivery_mode), _UINT8_T, AMQP_BASIC_DELIVERY_MODE_FLAG},
-                                    { "priority", offsetof(amqp_basic_properties_t,priority), _UINT8_T, AMQP_BASIC_PRIORITY_FLAG},
-                                    { "correlation_id", offsetof(amqp_basic_properties_t,correlation_id), _BYTES_T, AMQP_BASIC_CORRELATION_ID_FLAG},
-                                    { "reply_to", offsetof(amqp_basic_properties_t,reply_to), _BYTES_T, AMQP_BASIC_REPLY_TO_FLAG},
-                                    { "expiration", offsetof(amqp_basic_properties_t,expiration), _BYTES_T, AMQP_BASIC_EXPIRATION_FLAG},
-                                    { "message_id", offsetof(amqp_basic_properties_t,message_id), _BYTES_T, AMQP_BASIC_MESSAGE_ID_FLAG},
-                                    { "timestamp", offsetof(amqp_basic_properties_t,timestamp), _UINT64_T, AMQP_BASIC_TIMESTAMP_FLAG},
-                                    { "type", offsetof(amqp_basic_properties_t,type), _BYTES_T, AMQP_BASIC_TYPE_FLAG},
-                                    { "user_id", offsetof(amqp_basic_properties_t,user_id), _BYTES_T, AMQP_BASIC_USER_ID_FLAG},
-                                    { "app_id", offsetof(amqp_basic_properties_t,app_id), _BYTES_T, AMQP_BASIC_APP_ID_FLAG},
-                                    { "cluster_id", offsetof(amqp_basic_properties_t,cluster_id), _BYTES_T, AMQP_BASIC_CLUSTER_ID_FLAG},
+static amqp_field amqp_fields[] = { { "content_type", offsetof(amqp_basic_properties_t,content_type), PGAMQP_BYTES_T, AMQP_BASIC_CONTENT_TYPE_FLAG},
+                                    { "content_encoding", offsetof(amqp_basic_properties_t,content_encoding), PGAMQP_BYTES_T, AMQP_BASIC_CONTENT_ENCODING_FLAG},
+                                    { "delivery_mode", offsetof(amqp_basic_properties_t,delivery_mode), PGAMQP_UINT8_T, AMQP_BASIC_DELIVERY_MODE_FLAG},
+                                    { "priority", offsetof(amqp_basic_properties_t,priority), PGAMQP_UINT8_T, AMQP_BASIC_PRIORITY_FLAG},
+                                    { "correlation_id", offsetof(amqp_basic_properties_t,correlation_id), PGAMQP_BYTES_T, AMQP_BASIC_CORRELATION_ID_FLAG},
+                                    { "reply_to", offsetof(amqp_basic_properties_t,reply_to), PGAMQP_BYTES_T, AMQP_BASIC_REPLY_TO_FLAG},
+                                    { "expiration", offsetof(amqp_basic_properties_t,expiration), PGAMQP_BYTES_T, AMQP_BASIC_EXPIRATION_FLAG},
+                                    { "message_id", offsetof(amqp_basic_properties_t,message_id), PGAMQP_BYTES_T, AMQP_BASIC_MESSAGE_ID_FLAG},
+                                    { "timestamp", offsetof(amqp_basic_properties_t,timestamp), PGAMQP_UINT64_T, AMQP_BASIC_TIMESTAMP_FLAG},
+                                    { "type", offsetof(amqp_basic_properties_t,type), PGAMQP_BYTES_T, AMQP_BASIC_TYPE_FLAG},
+                                    { "user_id", offsetof(amqp_basic_properties_t,user_id), PGAMQP_BYTES_T, AMQP_BASIC_USER_ID_FLAG},
+                                    { "app_id", offsetof(amqp_basic_properties_t,app_id), PGAMQP_BYTES_T, AMQP_BASIC_APP_ID_FLAG},
+                                    { "cluster_id", offsetof(amqp_basic_properties_t,cluster_id), PGAMQP_BYTES_T, AMQP_BASIC_CLUSTER_ID_FLAG},
                                     { NULL, 0, 0, 0}
 };
 
@@ -393,14 +393,14 @@ int amqp_set_property(amqp_basic_properties_t* properties, char* key, char* valu
   field = (void*)((size_t)&properties->headers + amqp_fields[i].offset);
 
   switch (amqp_fields[i].type) {
-  case _BYTES_T:
+  case PGAMQP_BYTES_T:
     ((amqp_bytes_t*)field)->len = strlen(value);
     ((amqp_bytes_t*)field)->bytes = value;
     break;
-  case _UINT64_T:
+  case PGAMQP_UINT64_T:
     *(uint64_t*)field = (uint64_t)atoi(value);
     break;
-  case _UINT8_T:
+  case PGAMQP_UINT8_T:
     *(uint8_t*)field = (uint8_t)atoi(value);
     break;
   }
